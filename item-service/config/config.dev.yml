@@ -1,0 +1,25 @@
+---
+debug: true
+contextTimeout: 5
+
+server:
+  port: "80"
+  host: "0.0.0.0"
+  env: "dev"
+  useRedis: false
+
+services:
+  categoryServiceURL: "http://category-service/api/category/"
+  variantServiceURL: "http://variant-service/api/variant/"
+
+database:
+  driver: "postgres"
+  host: "192.168.1.36"
+  port: 5432
+  username: "titus"
+  password: "saota1278"
+  name: "item-service"
+
+nsq:
+  host: "nsqd"
+  port: 4150
