@@ -1,7 +1,7 @@
 package models
 
 import (
-	"item-service/internal/models/common"
+	"search-service/internal/models/common"
 
 	"github.com/lib/pq"
 )

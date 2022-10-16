@@ -17,5 +17,5 @@ database:
   host: "postgres-replica-postgresql-ha-pgpool"
   port: 5432
   username: "postgres"
-  password: "yreWshXU5e"
+  password: "IYLstk1llz"
   name: "item-service"

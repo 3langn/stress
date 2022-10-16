@@ -39,6 +39,7 @@ func (m *ItemRepositoryImpl) Search(ctx context.Context, req SearchItemOption) (
 	err = m.db.Debug().
 		Model(&models.Item{}).
 		WithContext(ctx).
+		Select("id,name,price,discount").
 		Where("name ILIKE ?", "%"+req.Keyword+"%").
 		Limit(req.Limit).Offset(req.Limit * (req.Page - 1)).
 		Order(req.Sort).

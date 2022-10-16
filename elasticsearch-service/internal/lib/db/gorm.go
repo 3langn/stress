@@ -3,9 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"item-service/config"
-	"item-service/internal/models"
 	"os"
+	"search-service/config"
+	"search-service/internal/models"
 
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -60,7 +60,6 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect database: %w", err)
 		}
-		break
 	case "postgres":
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai",
 			config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name, config.Database.Port)
@@ -70,7 +69,6 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect database: %w", err)
 		}
-		break
 	}
 	return db, nil
 }
@@ -79,8 +77,6 @@ func (d Database) RegisterTables() {
 	err := d.AutoMigrate(
 		models.Item{},
 	)
-
-	d.Exec("ALTER TABLE items ADD COLUMN ts tsvector GENERATED ALWAYS AS (to_tsvector('english', name)) STORED;")
 
 	if err != nil {
 		d.logger.Fatal("Database migration error", zap.Error(err))
