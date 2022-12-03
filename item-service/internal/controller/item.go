@@ -4,7 +4,6 @@ import (
 	"item-service/internal/dto"
 	"item-service/internal/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -25,34 +24,18 @@ func InitItemController(c *gin.RouterGroup, groupService service.ItemService, lo
 	g.GET("/:id", controller.GetByID)
 	g.GET("/search", controller.Search)
 	g.POST("/create", controller.Create)
+	g.POST("/calculate-stock", controller.CalculateStock)
+	g.POST("/compensation-stock", controller.CalculateStock)
 }
 
-// GetByID godoc
-// @Summary Get Item By ID
-// @Description Get Item By ID
-// @Tags Item
-// @Accept json
-// @Produce json
-// @Param id path int true "ID"
-// @Security ApiKeyAuth
-// @Header 200 {string} Token "qwerty"
-// @Success 200 {object} SimpleResponse{data=models.Item} "Item Info"
-// @Failure 400,401,404 {object} ResponseError
-// @Failure 500 {object} ResponseError
-// @Router /business_groups/{id} [get]
 func (b *ItemController) GetByID(c *gin.Context) {
-	idParam, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return
-	}
-	id := int64(idParam)
-	bg, err := b.ItemService.GetByID(c, id)
+	idParam := c.Param("id")
+	bg, err := b.ItemService.GetByID(c, idParam)
 	if err != nil {
 		b.ResponseError(c, http.StatusBadRequest, []error{err})
 		return
 	}
 	b.Response(c, http.StatusOK, "success", bg)
-	return
 }
 
 func (b *ItemController) Search(c *gin.Context) {
@@ -84,5 +67,32 @@ func (b *ItemController) Create(c *gin.Context) {
 		return
 	}
 	b.Response(c, http.StatusOK, "success", res)
-	return
+}
+
+func (b *ItemController) CalculateStock(c *gin.Context) {
+	var req dto.CalculateStockRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		b.ResponseError(c, http.StatusBadRequest, []error{err})
+		return
+	}
+	statusCode, err := b.ItemService.CalculateStock(c, req.ItemID, req.Quantity)
+	if err != nil {
+		b.ResponseError(c, statusCode, []error{err})
+		return
+	}
+	b.Response(c, http.StatusOK, "success", nil)
+}
+
+func (b *ItemController) CompensationStock(c *gin.Context) {
+	var req dto.CalculateStockRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		b.ResponseError(c, http.StatusBadRequest, []error{err})
+		return
+	}
+	statusCode, err := b.ItemService.CompensationStock(c, req.ItemID, req.Quantity)
+	if err != nil {
+		b.ResponseError(c, statusCode, []error{err})
+		return
+	}
+	b.Response(c, http.StatusOK, "success", nil)
 }

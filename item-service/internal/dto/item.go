@@ -6,16 +6,16 @@ type CreateItemRequest struct {
 	PriceMax float64 `json:"price_max"`
 	PriceMin float64 `json:"price_min"`
 	//PriceBeforeDiscount float64  `json:"price_before_discount"`
-	ShowFreeShip bool    `json:"show_free_ship"`
-	Description  string  `json:"description"`
-	SKU          string  `json:"sku"`
-	Quantity     int     `json:"quantity"`
-	Discount     string  `json:"discount"`
-	RawDiscount  float64 `json:"raw_discount"`
-	//Stock        int      `json:"stock"`
-	Images     []string `json:"images"`
-	CategoryID string   `json:"category_id"`
-	VariantIDs []int64  `json:"variant_ids"`
+	ShowFreeShip bool     `json:"show_free_ship"`
+	Description  string   `json:"description"`
+	SKU          string   `json:"sku"`
+	Quantity     int64    `json:"quantity"`
+	Discount     string   `json:"discount"`
+	RawDiscount  float64  `json:"raw_discount"`
+	Stock        int64    `json:"stock"`
+	Images       []string `json:"images"`
+	CategoryID   string   `json:"category_id"`
+	VariantIDs   []int64  `json:"variant_ids"`
 }
 
 type UpdateItemRequest struct {
@@ -24,4 +24,9 @@ type UpdateItemRequest struct {
 type SearchItemRequest struct {
 	Keyword string `json:"keyword" form:"keyword"`
 	Paging
+}
+
+type CalculateStockRequest struct {
+	Quantity int64  `json:"quantity"`
+	ItemID   string `json:"item_id"`
 }

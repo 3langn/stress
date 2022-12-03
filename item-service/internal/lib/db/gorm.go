@@ -76,7 +76,7 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 }
 
 func (d Database) RegisterTables() {
-	err := d.AutoMigrate(
+	err := d.DB.AutoMigrate(
 		models.Item{},
 	)
 

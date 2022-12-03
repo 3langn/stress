@@ -16,9 +16,11 @@ import (
 
 type (
 	ItemService interface {
-		GetByID(ctx context.Context, id int64) (item models.Item, err error)
+		GetByID(ctx context.Context, id string) (item models.Item, err error)
 		Search(ctx context.Context, req dto.SearchItemRequest) (res []models.Item, total *int64, statusCode int, err error)
 		Create(ctx context.Context, req dto.CreateItemRequest) (item models.Item, statusCode int, err error)
+		CalculateStock(ctx context.Context, itemID string, quantity int64) (statusCode int, err error)
+		CompensationStock(ctx context.Context, itemID string, quantity int64) (statusCode int, err error)
 	}
 
 	ItemServiceImpl struct {
@@ -143,7 +145,41 @@ func NewItemService(itemRepo repository.ItemRepository, config config.Config) It
 	}
 }
 
-func (s *ItemServiceImpl) GetByID(ctx context.Context, id int64) (item models.Item, err error) {
+func (s *ItemServiceImpl) GetByID(ctx context.Context, id string) (item models.Item, err error) {
 	item, err = s.repo.GetByID(ctx, id)
 	return
+}
+
+func (s *ItemServiceImpl) CalculateStock(ctx context.Context, itemID string, quantity int64) (statusCode int, err error) {
+	item, err := s.repo.GetByID(ctx, itemID)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	if int64(item.Stock) < quantity {
+		return http.StatusBadRequest, fmt.Errorf("not enough stock")
+	}
+
+	stock := int64(item.Stock) - quantity
+
+	if err := s.repo.DB().Model(models.Item{}).Update("stock", stock).Error; err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func (s *ItemServiceImpl) CompensationStock(ctx context.Context, itemID string, quantity int64) (statusCode int, err error) {
+	item, err := s.repo.GetByID(ctx, itemID)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	stock := int64(item.Stock) + quantity
+
+	if err := s.repo.DB().Model(models.Item{}).Update("stock", stock).Error; err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
 }

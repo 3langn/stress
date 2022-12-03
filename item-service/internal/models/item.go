@@ -32,10 +32,10 @@ type Item struct {
 
 	Description string         `json:"description"`
 	SKU         string         `json:"sku" gorm:"unique"`
-	Quantity    int            `json:"quantity"`
+	Quantity    int64          `json:"quantity"`
 	Discount    string         `json:"discount"`
 	RawDiscount float64        `json:"raw_discount"`
-	Stock       int            `json:"stock"`
+	Stock       int64          `json:"stock"`
 	Images      pq.StringArray `json:"images" gorm:"type:text[]"`
 	VariantIDs  pq.Int64Array  `gorm:"type:integer[]"`
 

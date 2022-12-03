@@ -21,5 +21,4 @@ func (index *HealthController) Health(c *gin.Context) {
 		Message: "success",
 		Data:    time.Now().Format("2006-01-02 15:04:05"),
 	})
-	return
 }

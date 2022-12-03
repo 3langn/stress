@@ -17,13 +17,18 @@ type SearchItemOption struct {
 }
 
 type ItemRepository interface {
-	GetByID(ctx context.Context, id int64) (res models.Item, err error)
+	GetByID(ctx context.Context, id string) (res models.Item, err error)
 	Search(ctx context.Context, req SearchItemOption) (res []models.Item, total *int64, err error)
 	Create(ctx context.Context, req models.Item) (res models.Item, err error)
+	DB() *gorm.DB
 }
 
 type ItemRepositoryImpl struct {
 	db *db.Database
+}
+
+func (m *ItemRepositoryImpl) DB() *gorm.DB {
+	return m.db.DB
 }
 
 func (m *ItemRepositoryImpl) Create(ctx context.Context, req models.Item) (res models.Item, err error) {
@@ -58,7 +63,7 @@ func NewItemRepository(engine *db.Database) ItemRepository {
 	return &ItemRepositoryImpl{db: engine}
 }
 
-func (m *ItemRepositoryImpl) GetByID(ctx context.Context, id int64) (res models.Item, err error) {
+func (m *ItemRepositoryImpl) GetByID(ctx context.Context, id string) (res models.Item, err error) {
 	err = m.db.WithContext(ctx).Where("id = ?", id).First(&res).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
